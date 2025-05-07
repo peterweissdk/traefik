@@ -1,4 +1,13 @@
 #!/bin/bash
+# ----------------------------------------------------------------------------
+# Script Name: update_traefik.sh
+# Description: Tool designed to update Traefik
+# Author: peterweissdk
+# Email: peterweissdk@flems.dk
+# Date: 2025-05-07
+# Version: v0.1.0
+# Usage: Run script, or add it to cron
+# ----------------------------------------------------------------------------
 
 # Global variables
 VERSION=""
