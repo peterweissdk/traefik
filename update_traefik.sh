@@ -97,6 +97,32 @@ get_github_version() {
     echo "$version"
 }
 
+# Check versions and prompt for update
+check_version() {
+    local current_version github_version
+    current_version=$(get_current_version)
+    github_version=$(get_github_version)
+
+    log "INFO" "Current Traefik version: $current_version"
+    log "INFO" "Latest GitHub version:   $github_version"
+
+    if [ "$current_version" = "$github_version" ]; then
+        log "INFO" "You have the latest version of Traefik installed."
+        exit -1
+    fi
+
+    log "INFO" "A newer version of Traefik is available."
+    read -p "Do you want to update Traefik to v$github_version? (y/N): " response
+
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        log "INFO" "Update cancelled."
+        exit -1
+    fi
+
+    VERSION=$github_version
+    log "INFO" "Proceeding with update to v$VERSION"
+}
+
 # Download and extract new version
 download_traefik() {
     mkdir -p /root/traefikBinary
@@ -143,32 +169,6 @@ install_binary() {
 # Cleanup downloaded files
 cleanup() {
     rm -rf /root/traefikBinary/*
-}
-
-# Check versions and prompt for update
-check_version() {
-    local current_version github_version
-    current_version=$(get_current_version)
-    github_version=$(get_github_version)
-
-    log "INFO" "Current Traefik version: $current_version"
-    log "INFO" "Latest GitHub version:   $github_version"
-
-    if [ "$current_version" = "$github_version" ]; then
-        log "INFO" "You have the latest version of Traefik installed."
-        exit 0
-    fi
-
-    log "INFO" "A newer version of Traefik is available."
-    read -p "Do you want to update Traefik to v$github_version? (y/N): " response
-
-    if [[ ! "$response" =~ ^[Yy]$ ]]; then
-        log "INFO" "Update cancelled."
-        exit 0
-    fi
-
-    VERSION=$github_version
-    log "INFO" "Proceeding with update to v$VERSION"
 }
 
 # Main execution
