@@ -4,6 +4,7 @@
 VERSION=""
 LOG_DIR="/var/log/"
 LOG_FILE="${LOG_DIR}/update_traefik.log"
+DOWNLOAD_DIR=""
 
 # Initialize environment and create necessary directories/files
 init() {
@@ -135,7 +136,17 @@ download_traefik() {
     fi
 
     log "INFO" "Extracting Traefik binary..."
-    tar xzvf "traefik_v${VERSION}_linux_amd64.tar.gz" --one-top-level
+    if ! tar xzvf "traefik_v${VERSION}_linux_amd64.tar.gz" --one-top-level; then
+        log "ERROR" "Failed to extract Traefik archive"
+        exit 1
+    fi
+
+    # Set DOWNLOAD_DIR to the extracted directory
+    DOWNLOAD_DIR="/root/traefikBinary/traefik_v${VERSION}_linux_amd64"
+    if [ ! -d "$DOWNLOAD_DIR" ]; then
+        log "ERROR" "Extraction directory not found: $DOWNLOAD_DIR"
+        exit 1
+    fi
 }
 
 # Install new binary
@@ -168,12 +179,11 @@ install_binary() {
 
 # Cleanup extracted files
 cleanup() {
-    local target_dir="/root/traefikBinary/traefik_v${VERSION}_linux_amd64"
     log "INFO" "Cleaning up extracted files..."
-    rm -rf "$target_dir"
+    rm -rf "$DOWNLOAD_DIR"
 
-    if [ -d "$target_dir" ]; then
-        log "ERROR" "Failed to remove directory: $target_dir"
+    if [ -d "$DOWNLOAD_DIR" ]; then
+        log "ERROR" "Failed to remove directory: $DOWNLOAD_DIR"
         exit 1
     fi
 }
