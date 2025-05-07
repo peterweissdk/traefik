@@ -147,10 +147,12 @@ download_traefik() {
     fi
 
     log "INFO" "Extracting Traefik binary..."
+    echo "#####Extracted files#####"
     if ! tar xzvf "traefik_v${VERSION}_linux_amd64.tar.gz" --one-top-level; then
         log "ERROR" "Failed to extract Traefik archive"
         exit 1
     fi
+    echo "#####################"
 
     # Set DOWNLOAD_DIR to the extracted directory
     DOWNLOAD_DIR="/root/traefikBinary/traefik_v${VERSION}_linux_amd64"
@@ -167,6 +169,7 @@ install_binary() {
         log "ERROR" "Failed to stop Traefik service"
         exit 1
     fi
+    sleep 2
 
     log "INFO" "Installing new Traefik binary..."
     if cp "$DOWNLOAD_DIR/traefik" "$INSTALL_DIR/traefik"; then
@@ -184,6 +187,7 @@ install_binary() {
         log "ERROR" "Failed to start Traefik service"
         exit 1
     fi
+    sleep 2
 }
 
 # Cleanup extracted files
