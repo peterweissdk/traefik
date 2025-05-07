@@ -152,7 +152,7 @@ download_traefik() {
         log "ERROR" "Failed to extract Traefik archive"
         exit 1
     fi
-    echo "#####################"
+    echo "#########################"
 
     # Set DOWNLOAD_DIR to the extracted directory
     DOWNLOAD_DIR="/root/traefikBinary/traefik_v${VERSION}_linux_amd64"
