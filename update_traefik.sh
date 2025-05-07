@@ -5,6 +5,32 @@ VERSION=""
 LOG_DIR="/var/log/"
 LOG_FILE="${LOG_DIR}/update_traefik.log"
 
+# Initialize environment and create necessary directories/files
+init() {
+    # Create log directory and file if they don't exist
+    mkdir -p "${LOG_DIR}"
+    if [ ! -d "${LOG_DIR}" ]; then
+        echo "ERROR: Failed to create log directory ${LOG_DIR}" >&2
+        exit 1
+    fi
+    chmod 755 "${LOG_DIR}"  # rwxr-xr-x
+    
+    if [ ! -f "${LOG_FILE}" ]; then
+        touch "${LOG_FILE}"
+        if [ ! -f "${LOG_FILE}" ]; then
+            echo "ERROR: Failed to create log file ${LOG_FILE}" >&2
+            exit 1
+        fi
+        chmod 644 "${LOG_FILE}"  # rw-r--r--
+    fi
+
+    # Test if we can write to the log file
+    if ! echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] Log system initialized" >> "${LOG_FILE}"; then
+        echo "ERROR: Cannot write to log file ${LOG_FILE}" >&2
+        exit 1
+    fi
+}
+
 # Write to log file
 log() {
     local level=$1
@@ -29,10 +55,11 @@ command_exists() {
 check_dependencies() {
     for cmd in traefik wget jq systemctl; do
         if ! command_exists "$cmd"; then
-            echo "Error: Required command '$cmd' is not installed."
+            log "ERROR" "Required command '$cmd' is not installed."
             exit 1
         fi
     done
+    log "INFO" "All required dependencies are installed."
 }
 
 # Get and validate current version
@@ -40,12 +67,12 @@ get_current_version() {
     local version
     version=$(traefik version | grep "Version:" | awk '{print $2}')
     if [ -z "$version" ]; then
-        echo "Error: Could not determine current Traefik version"
+        log "ERROR" "Could not determine current Traefik version"
         exit 1
     fi
 
     if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "Error: Invalid version format '$version'. Expected format: x.y.z"
+        log "ERROR" "Invalid version format '$version'. Expected format: x.y.z"
         exit 1
     fi
     echo "$version"
@@ -56,7 +83,7 @@ get_github_version() {
     local version
     version=$(wget -qO- https://api.github.com/repos/traefik/traefik/releases/latest | jq -r .tag_name)
     if [ -z "$version" ]; then
-        echo "Error: Could not fetch latest version from GitHub"
+        log "ERROR" "Could not fetch latest version from GitHub"
         exit 1
     fi
 
@@ -64,7 +91,7 @@ get_github_version() {
     version=${version#v}
 
     if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "Error: Invalid GitHub version format '$version'. Expected format: x.y.z"
+        log "ERROR" "Invalid GitHub version format '$version'. Expected format: x.y.z"
         exit 1
     fi
     echo "$version"
@@ -75,39 +102,40 @@ download_traefik() {
     mkdir -p /root/traefikBinary
     cd /root/traefikBinary || exit 1
 
-    echo "Downloading Traefik v$VERSION..."
+    log "INFO" "Downloading Traefik v$VERSION..."
     if ! wget "https://github.com/traefik/traefik/releases/download/v$VERSION/traefik_v${VERSION}_linux_amd64.tar.gz"; then
-        echo "Error: Failed to download Traefik"
+        log "ERROR" "Failed to download Traefik"
         exit 1
     fi
 
-    echo "Extracting Traefik binary..."
+    log "INFO" "Extracting Traefik binary..."
     tar xzvf "traefik_v${VERSION}_linux_amd64.tar.gz" --one-top-level
 }
 
 # Install new binary
 install_binary() {
-    echo "Stopping Traefik service..."
+    log "INFO" "Stopping Traefik service..."
     if ! systemctl stop traefik.service; then
-        echo "Error: Failed to stop Traefik service"
+        log "ERROR" "Failed to stop Traefik service"
         cleanup
         exit 1
     fi
 
-    echo "Installing new Traefik binary..."
+    log "INFO" "Installing new Traefik binary..."
     if cp traefik/traefik /usr/local/bin/traefik; then
         chown root:root /usr/local/bin/traefik
         chmod 755 /usr/local/bin/traefik
+        log "INFO" "Binary permissions set successfully"
     else
-        echo "Error: Failed to install new Traefik binary"
+        log "ERROR" "Failed to install new Traefik binary"
         systemctl start traefik.service
         cleanup
         exit 1
     fi
 
-    echo "Starting Traefik service..."
+    log "INFO" "Starting Traefik service..."
     if ! systemctl start traefik.service; then
-        echo "Error: Failed to start Traefik service"
+        log "ERROR" "Failed to start Traefik service"
         exit 1
     fi
 }
@@ -123,36 +151,34 @@ check_version() {
     current_version=$(get_current_version)
     github_version=$(get_github_version)
 
-    echo "Current Traefik version: $current_version"
-    echo "Latest GitHub version:   $github_version"
+    log "INFO" "Current Traefik version: $current_version"
+    log "INFO" "Latest GitHub version:   $github_version"
 
     if [ "$current_version" = "$github_version" ]; then
-        echo "You have the latest version of Traefik installed."
+        log "INFO" "You have the latest version of Traefik installed."
         exit 0
     fi
 
-    echo "A newer version of Traefik is available."
+    log "INFO" "A newer version of Traefik is available."
     read -p "Do you want to update Traefik to v$github_version? (y/N): " response
 
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
-        echo "Update cancelled."
+        log "INFO" "Update cancelled."
         exit 0
     fi
 
     VERSION=$github_version
+    log "INFO" "Proceeding with update to v$VERSION"
 }
 
-# Main function
-main() {
-    check_dependencies
-    check_version
-    download_traefik
-    install_binary
-    cleanup
+# Main execution
+init
+log "INFO" "Starting Traefik update process"
+check_dependencies
+check_version
+download_traefik
+install_binary
+cleanup
 
-    echo "Traefik has been successfully updated to v$VERSION"
-    traefik version
-}
-
-# Execute main function
-main
+log "INFO" "Traefik has been successfully updated to v$VERSION"
+traefik version
