@@ -14,6 +14,7 @@ VERSION=""
 LOG_DIR="/var/log/"
 LOG_FILE="${LOG_DIR}/update_traefik.log"
 DOWNLOAD_DIR=""
+INSTALL_DIR="/usr/local/bin"
 
 # Initialize environment and create necessary directories/files
 init() {
@@ -163,19 +164,17 @@ install_binary() {
     log "INFO" "Stopping Traefik service..."
     if ! systemctl stop traefik.service; then
         log "ERROR" "Failed to stop Traefik service"
-        cleanup
         exit 1
     fi
 
     log "INFO" "Installing new Traefik binary..."
-    if cp traefik/traefik /usr/local/bin/traefik; then
-        chown root:root /usr/local/bin/traefik
-        chmod 755 /usr/local/bin/traefik
+    if cp "$DOWNLOAD_DIR/traefik" "$INSTALL_DIR/traefik"; then
+        chown root:root "$INSTALL_DIR/traefik"
+        chmod 755 "$INSTALL_DIR/traefik"
         log "INFO" "Binary permissions set successfully"
     else
         log "ERROR" "Failed to install new Traefik binary"
         systemctl start traefik.service
-        cleanup
         exit 1
     fi
 
