@@ -15,6 +15,7 @@ LOG_DIR="/var/log/"
 LOG_FILE="${LOG_DIR}/update_traefik.log"
 DOWNLOAD_DIR=""
 INSTALL_DIR="/usr/local/bin"
+GITHUB_API_URL="https://api.github.com/repos/traefik/traefik/releases/latest"
 
 # Initialize environment and create necessary directories/files
 init() {
@@ -92,7 +93,7 @@ get_current_version() {
 # Get and validate latest version from GitHub
 get_github_version() {
     local version
-    version=$(wget -qO- https://api.github.com/repos/traefik/traefik/releases/latest | jq -r .tag_name)
+    version=$(wget -qO- "$GITHUB_API_URL" | jq -r .tag_name)
     if [ -z "$version" ]; then
         log "ERROR" "Could not fetch latest version from GitHub"
         exit 1
@@ -204,6 +205,5 @@ check_version
 download_traefik
 install_binary
 cleanup
-
 log "INFO" "Traefik has been successfully updated to v$VERSION"
 traefik version
