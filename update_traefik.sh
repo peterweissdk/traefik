@@ -53,7 +53,7 @@ command_exists() {
 
 # Check for required commands
 check_dependencies() {
-    for cmd in traefik wget jq systemctl; do
+    for cmd in traefik wget tar jq systemctl; do
         if ! command_exists "$cmd"; then
             log "ERROR" "Required command '$cmd' is not installed."
             exit 1
@@ -166,9 +166,16 @@ install_binary() {
     fi
 }
 
-# Cleanup downloaded files
+# Cleanup extracted files
 cleanup() {
-    rm -rf /root/traefikBinary/*
+    local target_dir="/root/traefikBinary/traefik_v${VERSION}_linux_amd64"
+    log "INFO" "Cleaning up extracted files..."
+    rm -rf "$target_dir"
+
+    if [ -d "$target_dir" ]; then
+        log "ERROR" "Failed to remove directory: $target_dir"
+        exit 1
+    fi
 }
 
 # Main execution
