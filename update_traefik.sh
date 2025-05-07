@@ -20,6 +20,12 @@ if [ -z "$current_version" ]; then
     exit 1
 fi
 
+# Validate version format (x.y.z)
+if ! [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: Invalid version format '$current_version'. Expected format: x.y.z"
+    exit 1
+fi
+
 # Get latest version from GitHub
 github_version=$(wget -qO- https://api.github.com/repos/traefik/traefik/releases/latest | jq -r .tag_name)
 if [ -z "$github_version" ]; then
@@ -29,6 +35,12 @@ fi
 
 # Remove 'v' prefix from GitHub version for comparison
 github_version_clean=${github_version#v}
+
+# Validate GitHub version format (x.y.z)
+if ! [[ "$github_version_clean" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: Invalid GitHub version format '$github_version_clean'. Expected format: x.y.z"
+    exit 1
+fi
 
 echo "Current Traefik version: $current_version"
 echo "Latest GitHub version:   $github_version_clean"
@@ -48,12 +60,6 @@ if [[ ! "$response" =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-echo "Stopping Traefik service..."
-if ! systemctl stop traefik.service; then
-    echo "Error: Failed to stop Traefik service"
-    exit 1
-fi
-
 # Create directory if it doesn't exist
 mkdir -p /root/traefikBinary
 cd /root/traefikBinary || exit 1
@@ -63,13 +69,20 @@ echo "Downloading Traefik $github_version..."
 wget "https://github.com/traefik/traefik/releases/download/$github_version/traefik_${github_version}_linux_amd64.tar.gz"
 if [ $? -ne 0 ]; then
     echo "Error: Failed to download Traefik"
-    systemctl start traefik.service
     exit 1
 fi
 
 # Extract archive
 echo "Extracting Traefik binary..."
 tar xzvf "traefik_${github_version}_linux_amd64.tar.gz" --one-top-level
+
+# Stop Traefik service before replacing binary
+echo "Stopping Traefik service..."
+if ! systemctl stop traefik.service; then
+    echo "Error: Failed to stop Traefik service"
+    rm -rf /root/traefikBinary/*
+    exit 1
+fi
 
 # Copy binary and set permissions
 echo "Installing new Traefik binary..."
@@ -79,6 +92,7 @@ if cp traefik/traefik /usr/local/bin/traefik; then
 else
     echo "Error: Failed to install new Traefik binary"
     systemctl start traefik.service
+    rm -rf /root/traefikBinary/*
     exit 1
 fi
 
