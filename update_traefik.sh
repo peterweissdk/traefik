@@ -2,6 +2,23 @@
 
 # Global variables
 VERSION=""
+LOG_DIR="/var/log/"
+LOG_FILE="${LOG_DIR}/update_traefik.log"
+
+# Write to log file
+log() {
+    local level=$1
+    local message=$2
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[${timestamp}] [${level}] ${message}" >> "${LOG_FILE}"
+    
+    # Print to stdout, errors to stderr
+    if [ "$level" = "ERROR" ]; then
+        echo "[${timestamp}] [${level}] ${message}" >&2
+    else
+        echo "${message}"
+    fi
+}
 
 # Function to check if command exists
 command_exists() {
