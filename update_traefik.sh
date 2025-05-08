@@ -233,13 +233,23 @@ rollback() {
         exit 1
     fi
 
+    # Get current version
+    current_version=$(get_current_version)
+    echo "Current Traefik version: $current_version"
+    echo ""
+
     # Create numbered list of versions
     echo "Available versions for rollback:"
     declare -a versions
     for i in "${!files[@]}"; do
         version=$(echo "${files[$i]}" | grep -o 'v[0-9]\+\.[0-9]\+\.[0-9]\+')
+        version_without_v=${version#v}
         versions[$i]=$version
-        echo "$((i+1))) $version"
+        if [ "$version_without_v" = "$current_version" ]; then
+            echo "$((i+1))) $version (current)"
+        else
+            echo "$((i+1))) $version"
+        fi
     done
     # Add exit option
     echo "$((${#versions[@]}+1))) Exit"
@@ -264,10 +274,13 @@ rollback() {
     log "INFO" "Rolling back to version $selected_version"
     
     # Extract the selected archive
+    log "INFO" "Extracting Traefik binary..."
+    echo "#####Extracted files#####"
     if ! tar xzvf "$selected_file" --one-top-level -C "$DOWNLOAD_DIR_BASE"; then
         log "ERROR" "Failed to extract Traefik archive"
         exit 1
     fi
+    echo "#########################"
 
     # Set DOWNLOAD_DIR to the extracted directory
     DOWNLOAD_DIR="${DOWNLOAD_DIR_BASE}traefik_${selected_version}_linux_amd64"
