@@ -1,6 +1,10 @@
 # STILL IN TEST FACE, BECAREFULL TO USE THIS SCRIPT
 
 # 💾 Traefik Container Setup
+[![Static Badge](https://img.shields.io/badge/Linux-Ubuntu-white?style=flat&logo=linux&logoColor=white&logoSize=auto&labelColor=black)](https://www.linux.org/)
+[![Static Badge](https://img.shields.io/badge/Container-LXC-white?style=flat&logo=linuxcontainers&logoColor=white&logoSize=auto&labelColor=black)](https://www.linux.org/)
+[![Static Badge](https://img.shields.io/badge/Bash-script-white?style=flat&logo=gnubash&logoColor=white&logoSize=auto&labelColor=black)](https://www.gnu.org/software/bash/)
+[![Static Badge](https://img.shields.io/badge/GPL-V3-white?style=flat&logo=gnu&logoColor=white&logoSize=auto&labelColor=black)](https://www.gnu.org/licenses/gpl-3.0.en.html/)
 
 Automated setup for Traefik reverse proxy in an LXC container with proper security configurations and dynamic routing capabilities.
 
