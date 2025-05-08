@@ -4,8 +4,8 @@
 # Description: Configure Traefik environment, permissions, and service
 # Author: peterweissdk
 # Email: peterweissdk@flems.dk
-# Date: 2025-05-08
-# Version: v0.1.0
+# Date: 2025-05-09
+# Version: v0.1.1
 # Usage: Run script as root
 # ----------------------------------------------------------------------------
 
