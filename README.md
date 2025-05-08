@@ -1,3 +1,5 @@
+# STILL IN TEST FACE, BECAREFULL TO USE THIS SCRIPT
+
 # 💾 Traefik Container Setup
 
 Automated setup for Traefik reverse proxy in an LXC container with proper security configurations and dynamic routing capabilities.
