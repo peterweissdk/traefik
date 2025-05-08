@@ -1,0 +1,78 @@
+
+# (Global Config)
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+# (API)
+api:
+  dashboard: true
+  insecure: false
+  disableDashboardAd: true
+  debug: true
+
+# (PILOT)
+pilot:
+  dashboard: false
+
+# (Logs)
+log:
+  filePath: "/var/log/traefik.log"
+  format: json
+  level: "ERROR"
+
+# (Access Log)
+accesslog:
+  addInternals: true
+  filePath: "/var/log/traefik-access.log"
+  bufferingSize: 128
+
+# (metrics)
+metrics:
+  addInternals: true
+
+# (tracing)
+# tracing:
+#   addInternals: true
+#   otlp: {}
+
+# (Providers)
+providers:
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
+
+# (EntryPoints)
+entryPoints:
+  web:
+    address: ":80"
+    # (Optional)
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: "domaine.com"   # CHANGE THIS TO YOUR OWN DOMAINE
+            sans:
+              - "*.domaine.com"   # CHANGE THIS TO YOUR OWN DOMAINE
+
+# (Certificate Resolvers)
+certificatesresolvers:
+  cloudflare:
+    acme:
+#     caServer: https://acme-v02.api.letsencrypt.org/directory         # prod
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # test
+      email: you@mail.com    # CHAGE THIS ot your own valid Cloudflare-account email
+      storage: /etc/traefik/acme/acme.json
+      dnschallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"

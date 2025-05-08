@@ -1,0 +1,13 @@
+
+http:
+
+  routers:
+
+    # (Dashboard - harden access: can only be accessed with a username/password)
+    dashboard:
+      rule: "Host(`traefik-dash.domaine.com`)"    # CHANGE THIS
+      service: api@internal
+      middlewares:
+        - auth
+      entryPoints:
+        - websecure

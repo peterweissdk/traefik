@@ -1,0 +1,12 @@
+
+# (TLS certificate)
+tls:
+  options:
+    default:
+      minVersion: VersionTLS13    # change to a lower version if you expect to service Internet traffic from around the world
+      curvePreferences:   # below priority sequence can be changed
+        - X25519     # the most commonly used 128-bit
+        - CurveP256  # the next most commonly used 128-bit
+        - CurveP384  # 192-bit
+        - CurveP521  # 256-bit
+      sniStrict: true     # true if our own certificates should be enforced

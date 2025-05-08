@@ -1,0 +1,18 @@
+
+http:
+
+  middlewares:
+
+    # (Authentication)
+    auth:
+      basicAuth:
+        users:    # users and their MD5 hashed passwords, granted access to the traefik-proxy dashboard
+          - "admin:$1$RKDiDKeB$d.Wun/OCa4HCsG.jAc2kh1"    # CHANGE THIS. Use cmd: openssl passwd -1 "my-password"
+          - "user1:$1$RKDiDKeB$d.Wun/OCa4HCsG.jAc2kh1"
+
+    # (IP range allowed)
+    hosts-endorsed:
+      ipAllowList:
+        sourceRange:
+          - "192.168.1.0/24"    # CHANGE THIS TO YOUR OWN IP RANGE
+          - "192.168.2.0/24"

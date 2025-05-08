@@ -51,9 +51,9 @@ chown -R traefik:traefik /etc/traefik/dynamic
 chown -R traefik:traefik /etc/traefik/acme
 
 # Create and configure .env file
-echo "Creating environment file..."
-touch /etc/traefik/.env
-chmod 600 /etc/traefik/.env
+#echo "Creating environment file..."
+#touch /etc/traefik/.env
+#chmod 600 /etc/traefik/.env
 
 # Create and configure log files
 echo "Setting up log files..."
@@ -62,34 +62,10 @@ touch /var/log/traefik-access.log
 chown traefik:traefik /var/log/traefik.log
 chown traefik:traefik /var/log/traefik-access.log
 
-# Create systemd service file
-echo "Creating systemd service..."
-cat > /lib/systemd/system/traefik.service << 'EOF'
-[Unit]
-Description=Traefik reverse proxy service
-After=network-online.target
-Wants=network-online.target systemd-networkd-wait-online.service
-
-[Service]
-Restart=on-failure
-
-User=traefik
-Group=traefik
-
-ProtectHome=true
-ProtectSystem=full
-ReadWriteDirectories=/etc/traefik/acme
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
-
-TimeoutStopSec=300
-EnvironmentFile=/etc/traefik/.env
-ExecStart=/usr/local/bin/traefik --configFile=/etc/traefik/traefik.yml
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# Copy systemd service file
+echo "Installing systemd service..."
+SCRIPT_DIR="$(dirname "$0")"
+cp "$SCRIPT_DIR/traefik.service" /lib/systemd/system/traefik.service
 
 # Set service file permissions
 echo "Setting service file permissions..."
