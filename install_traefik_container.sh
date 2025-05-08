@@ -89,9 +89,9 @@ install_traefik() {
     
     # Copy update script from local directory
     echo "Copying update script..."
-    pct push "$CTID" "$SCRIPT_DIR/update_traefik.sh" /root/script/update_traefik.sh
-    pct exec "$CTID" -- chown root:root /root/script/update_traefik.sh
-    pct exec "$CTID" -- chmod 755 /root/script/update_traefik.sh
+    pct push "$CTID" "$SCRIPT_DIR/update_traefik.sh" /root/traefikBinary/update_traefik.sh
+    pct exec "$CTID" -- chown root:root /root/traefikBinary/update_traefik.sh
+    pct exec "$CTID" -- chmod 755 /root/traefikBinary/update_traefik.sh
 
     # Copy and execute installation script
     echo "Copying installation script..."
@@ -106,6 +106,20 @@ install_traefik() {
     fi
     
     echo "Traefik installation completed successfully"
+
+    # Copy and execute setup script
+    echo "Copying setup script..."
+    pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
+    pct exec "$CTID" -- chown root:root /root/script/setup_traefik.sh
+    pct exec "$CTID" -- chmod 755 /root/script/setup_traefik.sh
+
+    echo "Running Traefik setup..."
+    if ! pct exec "$CTID" -- /root/script/setup_traefik.sh; then
+        echo "ERROR: Traefik setup failed"
+        exit 1
+    fi
+
+    echo "Traefik setup completed successfully"
     return 0
 }
 
@@ -118,3 +132,5 @@ echo "Container setup complete!"
 echo "Container ID: $CTID"
 echo "Hostname: $HOSTNAME"
 echo "You can access the container with: pct enter $CTID"
+
+exit 0
