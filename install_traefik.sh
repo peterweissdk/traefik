@@ -1,4 +1,13 @@
 #!/bin/bash
+# ----------------------------------------------------------------------------
+# Script Name: install_traefik.sh
+# Description: Tool designed to install Traefik
+# Author: peterweissdk
+# Email: peterweissdk@flems.dk
+# Date: 2025-05-08
+# Version: v0.1.0
+# Usage: Run script
+# ----------------------------------------------------------------------------
 
 # Variables
 TRAEFIK_VERSION="3.4.0"
@@ -34,27 +43,27 @@ download_traefik() {
 
 # Install function
 install_binary() {
-    echo "Stopping Traefik service..."
-    if ! systemctl stop traefik.service 2>/dev/null; then
-        echo "No existing Traefik service found, continuing with installation..."
-    fi
-    sleep 2
-
-    echo "Installing new Traefik binary..."
+    echo "Installing Traefik binary..."
     if cp "$DOWNLOAD_DIR/traefik" "$INSTALL_DIR/traefik"; then
         chown root:root "$INSTALL_DIR/traefik"
         chmod 755 "$INSTALL_DIR/traefik"
         echo "Binary permissions set successfully"
     else
         echo "Failed to install new Traefik binary"
-        systemctl start traefik.service 2>/dev/null
         exit 1
     fi
 }
 
-# Run installation
-download_traefik
-install_binary
+# Main execution function
+main() {
+    download_traefik
+    install_binary
 
-echo "Traefik v$TRAEFIK_VERSION has been installed successfully"
-traefik version
+    echo "Traefik v$TRAEFIK_VERSION has been installed successfully"
+    traefik version
+    return 0
+}
+
+# Run main and exit with its return code
+main
+exit $?

@@ -1,4 +1,13 @@
 #!/bin/bash
+# ----------------------------------------------------------------------------
+# Script Name: install_traefik_container.sh
+# Description: Tool designed to install Traefik in a container
+# Author: peterweissdk
+# Email: peterweissdk@flems.dk
+# Date: 2025-05-08
+# Version: v0.1.0
+# Usage: Run script
+# ----------------------------------------------------------------------------
 
 # Check if we're running as root
 if [ "$EUID" -ne 0 ]; then
@@ -91,7 +100,13 @@ install_traefik() {
     pct exec "$CTID" -- chmod 755 /root/script/install_traefik.sh
 
     echo "Running Traefik installation..."
-    pct exec "$CTID" -- /root/script/install_traefik.sh
+    if ! pct exec "$CTID" -- /root/script/install_traefik.sh; then
+        echo "ERROR: Traefik installation failed"
+        exit 1
+    fi
+    
+    echo "Traefik installation completed successfully"
+    return 0
 }
 
 # Run the functions

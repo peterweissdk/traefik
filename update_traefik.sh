@@ -125,7 +125,13 @@ check_version() {
     fi
 
     log "INFO" "A newer version of Traefik is available."
-    read -p "Do you want to update Traefik to v$github_version? (y/N): " response
+    
+    if [ "$AUTO_YES" = true ]; then
+        log "INFO" "Auto-yes enabled, proceeding with update"
+        response="y"
+    else
+        read -p "Do you want to update Traefik to v$github_version? (y/N): " response
+    fi
 
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
         log "INFO" "Update cancelled."
@@ -302,18 +308,20 @@ rollback() {
 # Main script execution
 main() {
     # Parse command line arguments
-    while getopts "ur" flag; do
+    AUTO_YES=false
+    while getopts "ury" flag; do
         case "${flag}" in
             u) 
-                update
-                return 0
+                ACTION="update"
                 ;;
             r)
-                rollback
-                return 0
+                ACTION="rollback"
+                ;;
+            y)
+                AUTO_YES=true
                 ;;
             *)
-                log "ERROR" "Invalid option. Usage: $0 [-u|-r]"
+                log "ERROR" "Invalid option. Usage: $0 [-u|-r] [-y]"
                 return 1
                 ;;
         esac
@@ -321,9 +329,25 @@ main() {
 
     # If no flags are provided, show usage
     if [ $OPTIND -eq 1 ]; then
-        echo -e "ERROR: No options were passed.\nUsage: $0 [-u|-r]\n  -u: Update Traefik\n  -r: Rollback to previous version"
+        echo -e "ERROR: No options were passed.\nUsage: $0 [-u|-r] [-y]\n  -u: Update Traefik\n  -r: Rollback to previous version\n  -y: Automatic yes to prompts"
         return 1
     fi
+
+    # Execute the selected action
+    case "$ACTION" in
+        update)
+            update
+            return 0
+            ;;
+        rollback)
+            rollback
+            return 0
+            ;;
+        *)
+            log "ERROR" "Please specify either -u for update or -r for rollback"
+            return 1
+            ;;
+    esac
 }
 
 # Execute main and exit with its return code
