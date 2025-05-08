@@ -46,6 +46,16 @@ setup_container() {
     pct exec "$CTID" -- apt-get update
     pct exec "$CTID" -- apt-get install -y wget tar jq
 
+    # Configure root autologin
+    echo "Configuring root autologin..."
+    pct exec "$CTID" -- mkdir -p /etc/systemd/system/console-getty.service.d
+    pct exec "$CTID" -- bash -c 'cat > /etc/systemd/system/console-getty.service.d/override.conf << EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear --keep-baud console 115200,38400,9600 linux
+EOF'
+    pct exec "$CTID" -- systemctl daemon-reload
+
     # Create required directories
     echo "Creating directories..."
     pct exec "$CTID" -- mkdir -p /root/traefikBinary
