@@ -37,10 +37,10 @@ Configuration files are stored in `traefik_conf/`:
 - `traefik.yaml`: Main Traefik configuration
 - `tls.yaml`: TLS/SSL settings
 - `middlewares.yaml`: HTTP middleware configurations
-- `openssl`: Generate MD5 hashed passwords for middleware authentication
 - `defaultRouters.yaml`: Default routing rules
 - `testRoute.yaml`: Test routing configuration
 - `.env`: Environment variables (for DNS challenge credentials)
+- `openssl`: Generate MD5 hashed passwords for middleware authentication
 
 ## 📝 Directory Structure
 
