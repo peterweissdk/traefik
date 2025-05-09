@@ -19,6 +19,7 @@ fi
 setup_container() {
 
     # Container configuration
+    ROOT_PASS="traefik"
     MEMORY="1024"
     SWAP="512"
     CORES="1"
@@ -85,8 +86,9 @@ setup_container() {
 
     # Create container
     echo "Creating container..."
-    pct create "$CTID" "$STORAGE:vztmpl/$TEMPLATE_PATH" \
+    pct create "$CTID" "$TEMPLATE_PATH" \
         --hostname "$HOSTNAME" \
+        --password "$ROOT_PASS" \
         --memory "$MEMORY" \
         --swap "$SWAP" \
         --cores "$CORES" \
