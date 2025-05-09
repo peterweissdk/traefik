@@ -34,6 +34,7 @@ setup_container() {
     HOSTNAME="traefik-proxy"  # Container hostname
     TEMPLATE="ubuntu-24.04-standard"
     STORAGE="local"
+    ROOT_PASS="default"
     MEMORY="1024"
     SWAP="1024"
     CORES="1"
@@ -51,6 +52,7 @@ setup_container() {
         --unprivileged 1 \
         --tags "$TAG" \
         --onboot 1 \
+        --password=$ROOT_PASS \
         --start 1 || { echo "Failed to create container"; exit 1; }
 
     # Wait for container to start with timeout
@@ -71,16 +73,6 @@ setup_container() {
     echo "Installing required packages..."
     pct exec "$CTID" -- apt-get update
     pct exec "$CTID" -- apt-get install -y wget tar jq
-
-    # Configure root autologin
-    echo "Configuring root autologin..."
-    pct exec "$CTID" -- mkdir -p /etc/systemd/system/console-getty.service.d
-    pct exec "$CTID" -- bash -c 'cat > /etc/systemd/system/console-getty.service.d/override.conf << EOF
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --autologin root --noclear --keep-baud console 115200,38400,9600 linux
-EOF'
-    pct exec "$CTID" -- systemctl daemon-reload
 
     # Create required directories
     echo "Creating directories..."
