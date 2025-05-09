@@ -132,5 +132,8 @@ echo "Container setup complete!"
 echo "Container ID: $CTID"
 echo "Hostname: $HOSTNAME"
 echo "You can access the container with: pct enter $CTID"
+echo ""
+echo "To generate MD5 hashed passwords to set authentication in middlewares.yaml:"
+echo "  openssl passwd -1 \"my-password\""
 
 exit 0

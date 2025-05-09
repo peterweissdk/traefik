@@ -37,6 +37,7 @@ Configuration files are stored in `traefik_conf/`:
 - `traefik.yaml`: Main Traefik configuration
 - `tls.yaml`: TLS/SSL settings
 - `middlewares.yaml`: HTTP middleware configurations
+- `openssl`: Generate MD5 hashed passwords for middleware authentication
 - `defaultRouters.yaml`: Default routing rules
 - `testRoute.yaml`: Test routing configuration
 - `.env`: Environment variables (for DNS challenge credentials)
@@ -45,18 +46,20 @@ Configuration files are stored in `traefik_conf/`:
 
 ```
 .
+├── traefik_conf/
+│   ├── traefik.yaml
+│   ├── .env
+│   ├── defaultRouters.yaml
+│   ├── testRoute.yaml
+│   ├── tls.yaml
+│   └── middlewares.yaml
 ├── install_traefik_container.sh
 ├── install_traefik.sh
 ├── setup_traefik.sh
 ├── update_traefik.sh
 ├── traefik.service
-└── traefik_conf/
-    ├── traefik.yaml
-    ├── .env
-    ├── defaultRouters.yaml
-    ├── testRoute.yaml
-    ├── tls.yaml
-    └── middlewares.yaml
+├── LICENSE
+└── README.md
 ```
 
 ## 🔍 Health Check
@@ -68,7 +71,7 @@ Monitor Traefik's health:
    ```
 2. View logs:
    ```bash
-   journalctl -u traefik
+   journalctl -u --boot traefik
    ```
 3. Access dashboard (if enabled):
    ```
