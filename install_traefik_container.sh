@@ -17,10 +17,39 @@ fi
 
 # Setup container and dependencies
 setup_container() {
-    # Check if template exists
-    if ! pveam list local | grep -q ${TEMPLATE}; then
-        echo "Error: Template '${TEMPLATE}' not found in local storage"
-        echo "Please download the template first using: pveam download local ${TEMPLATE}"
+
+    # Network configuration
+    read -p "Enter IP address for container (e.g., 192.168.1.10/24): " IP_ADDRESS
+    read -p "Enter gateway IP address (e.g., 192.168.1.1): " GATEWAY
+
+    # Validate IP address format
+    if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
+        echo "Error: Invalid IP address format. Expected format: xxx.xxx.xxx.xxx/xx"
+        exit 1
+    fi
+
+    # Validate gateway format
+    if [[ ! $GATEWAY =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: Invalid gateway format. Expected format: xxx.xxx.xxx.xxx"
+        exit 1
+    fi
+
+    # Check if IP is already in use
+    IP_WITHOUT_MASK=$(echo $IP_ADDRESS | cut -d'/' -f1)
+    if ping -c 1 -W 1 $IP_WITHOUT_MASK >/dev/null 2>&1; then
+        echo "Error: IP address $IP_WITHOUT_MASK is already in use"
+        exit 1
+    fi
+
+    # List available storages and prompt for selection
+    echo "Available storages:"
+    pvesm status
+    read -p "Enter storage name: " STORAGE
+    STORAGE=${STORAGE:-local}
+
+    # Validate storage exists and supports containers
+    if ! pvesm status | grep -q "^$STORAGE"; then
+        echo "Error: Storage '$STORAGE' not found"
         exit 1
     fi
 
@@ -33,10 +62,8 @@ setup_container() {
     echo "Using next available CTID: $CTID"
     HOSTNAME="traefik-proxy"  # Container hostname
     TEMPLATE="ubuntu-24.04-standard"
-    STORAGE="local"
-    ROOT_PASS="default"
     MEMORY="1024"
-    SWAP="1024"
+    SWAP="512"
     CORES="1"
     DISK_SIZE="8"
     TAG="proxy"
@@ -50,9 +77,10 @@ setup_container() {
         --cores "$CORES" \
         --rootfs "$STORAGE:$DISK_SIZE" \
         --unprivileged 1 \
+        --features keyctl=1,nesting=1,fuse=1 \
         --tags "$TAG" \
         --onboot 1 \
-        --password=$ROOT_PASS \
+        --net0 name=eth0,bridge=vmbr0,ip=$IP_ADDRESS,gw=$GATEWAY,type=veth \
         --start 1 || { echo "Failed to create container"; exit 1; }
 
     # Wait for container to start with timeout
@@ -73,6 +101,16 @@ setup_container() {
     echo "Installing required packages..."
     pct exec "$CTID" -- apt-get update
     pct exec "$CTID" -- apt-get install -y wget tar jq
+
+    # Configure root autologin
+    echo "Configuring root autologin..."
+    pct exec "$CTID" -- mkdir -p /etc/systemd/system/console-getty.service.d
+    pct exec "$CTID" -- bash -c 'cat > /etc/systemd/system/console-getty.service.d/override.conf << EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear --keep-baud console 115200,38400,9600 linux
+EOF'
+    pct exec "$CTID" -- systemctl daemon-reload
 
     # Create required directories
     echo "Creating directories..."
