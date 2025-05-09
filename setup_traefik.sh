@@ -14,12 +14,6 @@ set -e
 
 # Main setup function
 setup_traefik() {
-    # Check if we're running as root
-    if [ "$EUID" -ne 0 ]; then
-        echo "This script must be run as root"
-        return 1
-    fi
-
     echo "Setting up Traefik environment..."
 
     # Give Traefik binary the ability to bind to privileged ports
