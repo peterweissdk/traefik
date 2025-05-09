@@ -18,6 +18,15 @@ fi
 # Setup container and dependencies
 setup_container() {
 
+    # Container configuration
+    MEMORY="1024"
+    SWAP="512"
+    CORES="1"
+    DISK_SIZE="8"
+    TAG="proxy"
+    HOSTNAME="traefik-proxy"  # Container hostname
+    TEMPLATE="ubuntu-24.04-standard"
+
     # Network configuration
     read -p "Enter IP address for container (e.g., 192.168.1.10/24): " IP_ADDRESS
     read -p "Enter gateway IP address (e.g., 192.168.1.1): " GATEWAY
@@ -55,22 +64,28 @@ setup_container() {
 
     # Find next available CTID
     ctid=100  # Start checking from ID 100
-    while pct status $ctid >/dev/null 2>&1; do
+    while true; do
+        # Check if ID is used by either a container or VM
+        if ! pct status $ctid >/dev/null 2>&1 && ! qm status $ctid >/dev/null 2>&1; then
+            break  # ID is available
+        fi
         ((ctid++))
     done
     CTID=$ctid
     echo "Using next available CTID: $CTID"
-    HOSTNAME="traefik-proxy"  # Container hostname
-    TEMPLATE="ubuntu-24.04-standard"
-    MEMORY="1024"
-    SWAP="512"
-    CORES="1"
-    DISK_SIZE="8"
-    TAG="proxy"
+
+    # Find template path
+    echo "Searching for template: ${TEMPLATE}"
+    TEMPLATE_PATH=$(pveam list $STORAGE | grep "${TEMPLATE}" | awk '{print $1}')
+    echo "Found template path: ${TEMPLATE_PATH}"
+    if [ -z "$TEMPLATE_PATH" ]; then
+        echo "Error: Template '${TEMPLATE}' not found in storage '${STORAGE}'"
+        exit 1
+    fi
 
     # Create container
     echo "Creating container..."
-    pct create "$CTID" "local:vztmpl/$TEMPLATE" \
+    pct create "$CTID" "$STORAGE:vztmpl/$TEMPLATE_PATH" \
         --hostname "$HOSTNAME" \
         --memory "$MEMORY" \
         --swap "$SWAP" \
