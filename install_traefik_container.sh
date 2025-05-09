@@ -17,6 +17,13 @@ fi
 
 # Setup container and dependencies
 setup_container() {
+    # Check if template exists
+    if ! pveam list local | grep -q ${TEMPLATE}; then
+        echo "Error: Template '${TEMPLATE}' not found in local storage"
+        echo "Please download the template first using: pveam download local ${TEMPLATE}"
+        exit 1
+    fi
+
     # Find next available CTID
     ctid=100  # Start checking from ID 100
     while pct status $ctid >/dev/null 2>&1; do
