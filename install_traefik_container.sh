@@ -144,12 +144,14 @@ install_traefik() {
     pct push "$CTID" "$SCRIPT_DIR/install_traefik.sh" /root/script/install_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/traefik.service" /root/script/traefik.service
-    # Copy all files from traefik_conf directory
+    # Copy all files from traefik_conf directory (including hidden files)
+    shopt -s dotglob
     for file in "$SCRIPT_DIR"/traefik_conf/*; do
         if [ -f "$file" ]; then
             pct push "$CTID" "$file" "/root/script/traefik_conf/$(basename "$file")"
         fi
     done
+    shopt -u dotglob
 
     # Set all permissions
     echo "Setting file permissions..."
