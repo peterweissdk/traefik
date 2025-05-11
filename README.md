@@ -1,4 +1,4 @@
-# 💾 Traefik Container Setup
+# 💾 Traefik Container Setup In Proxmox
 [![Static Badge](https://img.shields.io/badge/Container-LXC-white?style=flat&logo=linuxcontainers&logoColor=white&logoSize=auto&labelColor=black)](https://linuxcontainers.org/lxc/introduction/)
 [![Static Badge](https://img.shields.io/badge/Ubuntu-24.04-white?style=flat&logo=ubuntu&logoColor=white&logoSize=auto&labelColor=black)](https://ubuntu.com/)
 [![Static Badge](https://img.shields.io/badge/Traefik-Proxy-white?style=flat&logo=traefikproxy&logoColor=white&logoSize=auto&labelColor=black)](https://traefik.io/)
@@ -19,7 +19,7 @@ Automated setup for Traefik reverse proxy in an LXC container with proper securi
 
 ## 🚀 Quick Start
 
-Run the following command to install Traefik:
+Run the following command to install Traefik in Proxmox:
 
 ```bash
 sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/peterweissdk/traefik/refs/heads/main/install.sh)"
