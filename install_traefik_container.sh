@@ -123,6 +123,10 @@ setup_container() {
     pct exec "$CTID" -- apt-get update
     pct exec "$CTID" -- apt-get install -y wget tar jq
 
+    # Force root password change on first login
+    echo "Setting root password to expire..."
+    pct exec "$CTID" -- chage -d 0 root
+
 
 }
 
@@ -196,5 +200,7 @@ echo "You can access the container with: pct enter $CTID"
 echo ""
 echo "To generate MD5 hashed passwords to set authentication in middlewares.yaml:"
 echo "  openssl passwd -1 \"my-password\""
+echo "Password: traefik"
+echo "Username: root"
 
 exit 0
