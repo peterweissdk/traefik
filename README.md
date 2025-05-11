@@ -33,20 +33,27 @@ This will:
 
 ## 🔧 Configuration
 
-Configuration files are stored in /etc/traefik & /etc/traefik/dynamic.
-Please change the configuration files to match your needs.
+Configuration files are stored in `/etc/traefik` & `/etc/traefik/dynamic`  
+Please change the configuration files to match your needs  
+
 - `traefik.yaml`: Main Traefik configuration
 - `tls.yaml`: TLS/SSL settings
 - `middlewares.yaml`: HTTP middleware configurations
 - `defaultRouters.yaml`: Default routing rules
 - `testRoute.yaml`: Test routing configuration
 - `.env`: Environment variables (for DNS challenge credentials)
-To generate MD5 hashed passwords for middleware authentication, run the following command:
+
+### Authentication
+
+To generate MD5 hashed passwords for middleware authentication:
+
 ```bash
 openssl passwd -1 "my-password"
 ```
-Default password: traefik
-Default username: root
+
+Default credentials:
+- Username: `root`
+- Password: `traefik`
 
 ## 📝 Directory Structure
 
