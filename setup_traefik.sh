@@ -81,6 +81,22 @@ setup_traefik() {
     echo "Reloading systemd daemon..."
     systemctl daemon-reload
 
+    # Enable and start Traefik service
+    echo "Enabling Traefik service..."
+    systemctl enable traefik.service
+
+    echo "Starting Traefik service..."
+    systemctl start traefik.service
+
+    # Check if service is running
+    echo "Checking Traefik service status..."
+    if ! systemctl is-active --quiet traefik.service; then
+        echo "ERROR: Traefik service failed to start"
+        systemctl status traefik.service
+        return 1
+    fi
+    echo "Traefik service is running successfully!"
+
     echo "Traefik setup completed successfully!"
     return 0
 }
