@@ -129,6 +129,7 @@ install_traefik() {
     echo "Creating directories..."
     pct exec "$CTID" -- mkdir -p /root/traefikBinary
     pct exec "$CTID" -- mkdir -p /root/script
+    pct exec "$CTID" -- mkdir -p /root/script/traefik_conf
 
     # Get script directory
     SCRIPT_DIR="$(dirname "$0")"
@@ -139,7 +140,7 @@ install_traefik() {
     pct push "$CTID" "$SCRIPT_DIR/install_traefik.sh" /root/script/install_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/traefik.service" /root/script/traefik.service
-    pct push "$CTID" "$SCRIPT_DIR/traefik_conf" /root/script/
+    pct push "$CTID" "$SCRIPT_DIR/traefik_conf" /root/script/traefik_conf
 
     # Set all permissions
     echo "Setting file permissions..."
