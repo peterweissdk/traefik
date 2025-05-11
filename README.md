@@ -21,16 +21,17 @@ Automated setup for Traefik reverse proxy in an LXC container with proper securi
 
 ## 🚀 Quick Start
 
-1. Clone this repository
-2. Run the container setup script:
-   ```bash
-   sudo ./install_traefik_container.sh
-   ```
-3. The script will:
-   - Create an LXC container
-   - Install Traefik
-   - Configure permissions and security
-   - Set up the service
+Run the following command to install Traefik:
+
+```bash
+sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/peterweissdk/traefik/refs/heads/main/install.sh)"
+```
+
+This will:
+- Create an LXC container
+- Install Traefik
+- Configure permissions and security
+- Set up the service
 
 ## 🔧 Configuration
 
@@ -48,14 +49,15 @@ Configuration files are stored in `traefik_conf/`:
 ```
 .
 ├── traefik_conf/
-│   ├── traefik.yaml
 │   ├── .env
+│   ├── traefik.yaml
 │   ├── defaultRouters.yaml
+│   ├── middlewares.yaml
 │   ├── testRoute.yaml
-│   ├── tls.yaml
-│   └── middlewares.yaml
-├── install_traefik_container.sh
+│   └── tls.yaml
+├── install.sh
 ├── install_traefik.sh
+├── install_traefik_container.sh
 ├── setup_traefik.sh
 ├── update_traefik.sh
 ├── traefik.service
