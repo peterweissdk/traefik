@@ -50,7 +50,6 @@ git clone https://github.com/peterweissdk/traefik.git "$TEMP_DIR"
 chmod +x "$TEMP_DIR"/install_traefik_container.sh
 chmod +x "$TEMP_DIR"/install_traefik.sh
 chmod +x "$TEMP_DIR"/setup_traefik.sh
-chmod +x "$TEMP_DIR"/update_traefik.sh
 
 # Run the installation script
 echo "Starting Traefik container installation..."

@@ -60,7 +60,7 @@ main() {
     install_binary
 
     echo "Traefik v$TRAEFIK_VERSION has been installed successfully"
-    traefik version
+#   traefik version
     return 0
 }
 

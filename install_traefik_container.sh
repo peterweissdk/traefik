@@ -119,44 +119,49 @@ setup_container() {
     pct exec "$CTID" -- apt-get update
     pct exec "$CTID" -- apt-get install -y wget tar jq
 
-    # Create required directories
-    echo "Creating directories..."
-    pct exec "$CTID" -- mkdir -p /root/traefikBinary
-    pct exec "$CTID" -- mkdir -p /root/script
+
 }
 
 # Install Traefik and setup scripts
 install_traefik() {
-    # Copy scripts from local directory
-    echo "Copying scripts to container..."
-    SCRIPT_DIR="$(dirname "$0")"
-    
-    # Copy update script from local directory
-    echo "Copying update script..."
-    pct push "$CTID" "$SCRIPT_DIR/update_traefik.sh" /root/traefikBinary/update_traefik.sh
-    pct exec "$CTID" -- chown root:root /root/traefikBinary/update_traefik.sh
-    pct exec "$CTID" -- chmod 755 /root/traefikBinary/update_traefik.sh
 
-    # Copy and execute installation script
-    echo "Copying installation script..."
+    # Create required directories
+    echo "Creating directories..."
+    pct exec "$CTID" -- mkdir -p /root/traefikBinary
+    pct exec "$CTID" -- mkdir -p /root/script
+
+    # Get script directory
+    SCRIPT_DIR="$(dirname "$0")"
+
+    echo "Copying all files to container..."
+    # Copy all required files
+    pct push "$CTID" "$SCRIPT_DIR/update_traefik.sh" /usr/local/bin/update_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/install_traefik.sh" /root/script/install_traefik.sh
+    pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
+    pct push "$CTID" "$SCRIPT_DIR/traefik.service" /root/script/traefik.service
+    pct push "$CTID" "$SCRIPT_DIR/traefik_conf" /root/script/
+
+    # Set all permissions
+    echo "Setting file permissions..."
+    pct exec "$CTID" -- chown root:root /usr/local/bin/update_traefik.sh
+    pct exec "$CTID" -- chmod 755 /usr/local/bin/update_traefik.sh
     pct exec "$CTID" -- chown root:root /root/script/install_traefik.sh
     pct exec "$CTID" -- chmod 755 /root/script/install_traefik.sh
+    pct exec "$CTID" -- chown -R root:root /root/script/setup_traefik.sh
+    pct exec "$CTID" -- chmod 755 /root/script/setup_traefik.sh
+    pct exec "$CTID" -- chown -R root:root /root/script/traefik.service
+    pct exec "$CTID" -- chmod 644 /root/script/traefik.service
+    pct exec "$CTID" -- chown -R root:root /root/script/traefik_conf
+    pct exec "$CTID" -- chmod 755 /root/script/traefik_conf
 
+    # Run installation
     echo "Running Traefik installation..."
     if ! pct exec "$CTID" -- /root/script/install_traefik.sh; then
         echo "ERROR: Traefik installation failed"
         exit 1
     fi
-    
-    echo "Traefik installation completed successfully"
 
-    # Copy and execute setup script
-    echo "Copying setup script..."
-    pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
-    pct exec "$CTID" -- chown root:root /root/script/setup_traefik.sh
-    pct exec "$CTID" -- chmod 755 /root/script/setup_traefik.sh
-
+    # Run setup
     echo "Running Traefik setup..."
     if ! pct exec "$CTID" -- /root/script/setup_traefik.sh; then
         echo "ERROR: Traefik setup failed"
