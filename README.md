@@ -1,5 +1,3 @@
-# STILL IN TEST FACE, BECAREFULL TO USE THIS SCRIPT
-
 # 💾 Traefik Container Setup
 [![Static Badge](https://img.shields.io/badge/Container-LXC-white?style=flat&logo=linuxcontainers&logoColor=white&logoSize=auto&labelColor=black)](https://linuxcontainers.org/lxc/introduction/)
 [![Static Badge](https://img.shields.io/badge/Ubuntu-24.04-white?style=flat&logo=ubuntu&logoColor=white&logoSize=auto&labelColor=black)](https://ubuntu.com/)
