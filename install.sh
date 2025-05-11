@@ -24,8 +24,18 @@ command_exists() {
 
 # Check for required commands
 if ! command_exists git; then
-    echo "Git is required but not installed. Installing..."
-    apt-get update && apt-get install -y git
+    echo "Git is required but not installed."
+    read -p "Would you like to install Git? (y/N) " answer
+    case ${answer:0:1} in
+        y|Y )
+            echo "Installing Git..."
+            apt-get update && apt-get install -y git
+            ;;
+        * )
+            echo "Git is required for installation. Exiting."
+            exit 1
+            ;;
+    esac
 fi
 
 # Create temporary directory
