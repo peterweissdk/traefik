@@ -9,6 +9,9 @@
 # Usage: Run script
 # ----------------------------------------------------------------------------
 
+# Global variables
+CTID=""
+
 # Check if we're running as root
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root"
@@ -73,6 +76,7 @@ setup_container() {
         ((ctid++))
     done
     CTID=$ctid
+    export CTID
     echo "Using next available CTID: $CTID"
 
     # Find template path
