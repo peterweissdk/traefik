@@ -144,7 +144,7 @@ install_traefik() {
 
     echo "Copying all files to container..."
     # Copy all required files
-    pct push "$CTID" "$SCRIPT_DIR/update_traefik.sh" /usr/local/bin/update_traefik.sh
+    pct push "$CTID" "$SCRIPT_DIR/traefik_update.sh" /usr/local/bin/traefik_update.sh
     pct push "$CTID" "$SCRIPT_DIR/install_traefik.sh" /root/script/install_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/traefik.service" /root/script/traefik.service
