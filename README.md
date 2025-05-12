@@ -70,7 +70,7 @@ Default credentials:
 ├── install_traefik.sh
 ├── install_traefik_container.sh
 ├── setup_traefik.sh
-├── update_traefik.sh
+├── traefik_update.sh
 ├── traefik.service
 ├── LICENSE
 └── README.md
