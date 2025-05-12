@@ -159,8 +159,8 @@ install_traefik() {
 
     # Set all permissions
     echo "Setting file permissions..."
-    pct exec "$CTID" -- chown root:root /usr/local/bin/update_traefik.sh
-    pct exec "$CTID" -- chmod 755 /usr/local/bin/update_traefik.sh
+    pct exec "$CTID" -- chown root:root /usr/local/bin/traefik_update.sh
+    pct exec "$CTID" -- chmod 755 /usr/local/bin/traefik_update.sh
     pct exec "$CTID" -- chown root:root /root/script/install_traefik.sh
     pct exec "$CTID" -- chmod 755 /root/script/install_traefik.sh
     pct exec "$CTID" -- chown -R root:root /root/script/setup_traefik.sh
