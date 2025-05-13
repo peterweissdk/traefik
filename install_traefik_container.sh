@@ -148,6 +148,7 @@ install_traefik() {
     pct push "$CTID" "$SCRIPT_DIR/install_traefik.sh" /root/script/install_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/setup_traefik.sh" /root/script/setup_traefik.sh
     pct push "$CTID" "$SCRIPT_DIR/traefik.service" /root/script/traefik.service
+    pct push "$CTID" "$SCRIPT_DIR/99-traefik-updates" /root/script/99-traefik-updates
     # Copy all files from traefik_conf directory (including hidden files)
     shopt -s dotglob
     for file in "$SCRIPT_DIR"/traefik_conf/*; do
@@ -167,6 +168,8 @@ install_traefik() {
     pct exec "$CTID" -- chmod 755 /root/script/setup_traefik.sh
     pct exec "$CTID" -- chown -R root:root /root/script/traefik.service
     pct exec "$CTID" -- chmod 644 /root/script/traefik.service
+    pct exec "$CTID" -- chown -R root:root /root/script/99-traefik-updates
+    pct exec "$CTID" -- chmod 755 /root/script/99-traefik-updates
     pct exec "$CTID" -- chown -R root:root /root/script/traefik_conf
     pct exec "$CTID" -- chmod 755 /root/script/traefik_conf
 

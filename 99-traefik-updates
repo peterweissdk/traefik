@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Check if traefik_update.sh exists
+if [ ! -x "/usr/local/bin/traefik_update.sh" ]; then
+    exit 0  # Silent exit for MOTD scripts is conventional
+fi
+
+# Get current version
+current_version=$(/usr/local/bin/traefik version 2>/dev/null | grep "Version:" | awk '{print $2}')
+
+# Check for updates
+if /usr/local/bin/traefik_update.sh -c >/dev/null 2>&1; then
+    # Update available
+    echo "🔄 Traefik update available! Current version: $current_version"
+    echo "   Run 'sudo traefik_update.sh -u' to update"
+else
+    # Up to date
+    echo "✅ Traefik version $current_version (up to date)"
+fi
