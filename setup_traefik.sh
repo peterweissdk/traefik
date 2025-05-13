@@ -106,37 +106,35 @@ configure_automatic_updates() {
     echo "Configuring automatic updates..."
     read -p "Would you like to enable automatic Traefik updates? (y/n): " enable_auto_updates
 
-    local cron_job
     if [[ "$enable_auto_updates" =~ ^[Yy]$ ]]; then
         # Schedule automatic updates at 3 AM every day
-        cron_job="0 3 * * * /usr/local/bin/traefik_update.sh -u -y"
+        local cron_job="0 3 * * * /usr/local/bin/traefik_update.sh -u -y"
         echo "Scheduling automatic updates to run daily at 3 AM"
-    else
-        # Schedule update checks at 3 AM every day
-        cron_job="0 3 * * * /usr/local/bin/traefik_update.sh -c"
-        echo "Scheduling update checks to run daily at 3 AM (without automatic installation)"
-    fi
 
-    # Add the cron job
-    echo "Current crontab:"
-    crontab -l 2>/dev/null || echo "No crontab"
-    
-    echo "Adding job: $cron_job"
-    if ! (crontab -l 2>/dev/null | grep -v "/usr/local/bin/traefik_update.sh"; echo "$cron_job") | crontab - 2>/tmp/crontab_error; then
-        echo "ERROR: Failed to modify crontab. Error was: $(cat /tmp/crontab_error)"
+        # Add the cron job
+        echo "Current crontab:"
+        crontab -l 2>/dev/null || echo "No crontab"
+        
+        echo "Adding job: $cron_job"
+        if ! (crontab -l 2>/dev/null | grep -v "/usr/local/bin/traefik_update.sh"; echo "$cron_job") | crontab - 2>/tmp/crontab_error; then
+            echo "ERROR: Failed to modify crontab. Error was: $(cat /tmp/crontab_error)"
+            rm -f /tmp/crontab_error
+            return 1
+        fi
         rm -f /tmp/crontab_error
-        return 1
-    fi
-    rm -f /tmp/crontab_error
-    
-    echo "New crontab:"
-    crontab -l 2>/dev/null
+        
+        echo "New crontab:"
+        crontab -l 2>/dev/null
 
-    # Verify cron job installation
-    if ! crontab -l | grep -q "/usr/local/bin/traefik_update.sh"; then
-        echo "ERROR: Failed to install cron job"
+        # Verify cron job installation
+        if ! crontab -l | grep -q "/usr/local/bin/traefik_update.sh"; then
+            echo "ERROR: Failed to install cron job"
+            return 1
+        else
+            echo "Cron job installed successfully"
+        fi
     else
-        echo "Cron job installed successfully"
+        echo "Automatic updates not enabled. No cron job will be installed."
     fi
 
     # Configure MOTD
