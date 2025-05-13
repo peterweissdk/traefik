@@ -106,7 +106,7 @@ configure_automatic_updates() {
     echo "Configuring automatic updates..."
     read -p "Would you like to enable automatic Traefik updates? (y/n): " enable_auto_updates
 
-    local cron_job
+    cron_job=""
     if [[ "$enable_auto_updates" =~ ^[Yy]$ ]]; then
         # Schedule automatic updates at 3 AM every day
         cron_job="0 3 * * * /usr/local/bin/traefik_update.sh -u -y"
