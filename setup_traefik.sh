@@ -118,9 +118,14 @@ configure_automatic_updates() {
     fi
 
     # Add the cron job
-    cron_command="(crontab -l 2>/dev/null | grep -v '/usr/local/bin/traefik_update.sh'; echo '${cron_job}') | crontab -"
-    echo "Running: $cron_command"
-    eval "$cron_command"
+    echo "Current crontab:"
+    crontab -l 2>/dev/null || echo "No crontab"
+    
+    echo "Adding job: $cron_job"
+    (crontab -l 2>/dev/null | grep -v "/usr/local/bin/traefik_update.sh"; echo "$cron_job") | crontab -
+    
+    echo "New crontab:"
+    crontab -l 2>/dev/null
 
     # Verify cron job installation
     if ! crontab -l | grep -q "/usr/local/bin/traefik_update.sh"; then
