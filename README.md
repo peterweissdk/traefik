@@ -16,6 +16,7 @@ Automated setup for Traefik reverse proxy in an LXC container with proper securi
 - Middleware configurations for security and routing
 - Systemd service integration
 - Automatic updates capability
+- MOTD notifications for available updates
 
 ## 🚀 Quick Start
 
@@ -72,6 +73,7 @@ Default credentials:
 ├── setup_traefik.sh
 ├── traefik_update.sh
 ├── traefik.service
+├── 99-traefik-updates
 ├── LICENSE
 └── README.md
 ```
