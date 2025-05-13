@@ -118,7 +118,16 @@ configure_automatic_updates() {
     fi
 
     # Add the cron job
-    (crontab -l 2>/dev/null | grep -v "/usr/local/bin/traefik_update.sh"; echo "$cron_job") | crontab -
+    cron_command="(crontab -l 2>/dev/null | grep -v '/usr/local/bin/traefik_update.sh'; echo '${cron_job}') | crontab -"
+    echo "Running: $cron_command"
+    eval "$cron_command"
+
+    # Verify cron job installation
+    if ! crontab -l | grep -q "/usr/local/bin/traefik_update.sh"; then
+        echo "ERROR: Failed to install cron job"
+    else
+        echo "Cron job installed successfully"
+    fi
 
     # Configure MOTD
     echo "Setting up MOTD for Traefik updates..."
