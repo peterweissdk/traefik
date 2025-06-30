@@ -32,6 +32,15 @@ This will:
 - Configure permissions and security
 - Set up the service
 
+## 👉🏽 Options
+
+The script supports the following command-line options:
+
+- `-y`: Automatically answer yes to all prompts during installation and updates
+- `-r`: Rollback Traefik to the previous installed version
+- `-c`: Check if a new version of Traefik is available
+- `-u`: Update Traefik to the latest version if an update is available
+
 ## 🔧 Configuration
 
 Configuration files are stored in `/etc/traefik` & `/etc/traefik/dynamic`  
